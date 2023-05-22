@@ -31,34 +31,41 @@ async function run() {
 
     const toyCollection = client.db('toy-marketplace').collection('addToy');
 
-    app.get('/addToy', async(req,res) =>{
-        let query ={};
-        if(req.query?.email){
-          query = {email: req.query.email}
-        }
-        else if(req.query?.toyName){
-          query = {toyName : req.query.toyName}
-        }
-        
-        const result = await toyCollection.find(query).limit(20).toArray();
+    app.get('/addToy', async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
+      }
+      else if (req.query?.toyName) {
+        query = { toyName: req.query.toyName }
+      }
+      const type = req.query.type;
+      if (type === 'Ascending') {
+        const result = await toyCollection.find(query).sort({price: 1}).limit(20).toArray();
         res.send(result);
-      })
-
-     //all toys
-      app.get('/addToy/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: new ObjectId(id) }
-        const result = await toyCollection.findOne(query);
+      }
+      else{
+        const result = await toyCollection.find(query).sort({price: -1}).limit(20).toArray();
         res.send(result);
-      })
+      }
+
+    })
+
+    //all toys
+    app.get('/addToy/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await toyCollection.findOne(query);
+      res.send(result);
+    })
 
 
-      app.delete('/addToy/:id', async(req,res)=>{
-        const id = req.params.id;
-        console.log(id);
-        const query = {_id: new ObjectId(id)}
-        const result = await toyCollection.deleteOne(query);
-        res.send(result);
+    app.delete('/addToy/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) }
+      const result = await toyCollection.deleteOne(query);
+      res.send(result);
     })
 
     // app.patch('/addToy/:id', async(req,res)=>{
@@ -82,22 +89,22 @@ async function run() {
       const updatedToy = req.body;
       const toy = {
         $set: {
-          quantity: updatedToy.quantity,      
+          quantity: updatedToy.quantity,
           details: updatedToy.details,
           price: updatedToy.price
         }
       }
-      const result = await toyCollection.updateOne(filter,toy, options);
+      const result = await toyCollection.updateOne(filter, toy, options);
       res.send(result);
     })
 
-    app.post('/addToy', async(req,res) =>{
-        const addToy = req.body;
-        console.log(addToy);
-        const result = await toyCollection.insertOne(addToy);
-        res.send(result);
-  
-      });
+    app.post('/addToy', async (req, res) => {
+      const addToy = req.body;
+      console.log(addToy);
+      const result = await toyCollection.insertOne(addToy);
+      res.send(result);
+
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -112,9 +119,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Running the server');
+  res.send('Running the server');
 })
 
 app.listen(port, () => {
-    console.log('Running from port', port);
+  console.log('Running from port', port);
 })
