@@ -41,12 +41,34 @@ async function run() {
       })
 
 
+      app.get('/addToy/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        const result = await toyCollection.findOne(query);
+        res.send(result);
+      })
+
+
       app.delete('/addToy/:id', async(req,res)=>{
         const id = req.params.id;
         console.log(id);
         const query = {_id: new ObjectId(id)}
         const result = await toyCollection.deleteOne(query);
         res.send(result);
+    })
+
+    app.patch('/addToy/:id', async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const updatedToy = req.body;
+      console.log(updatedToy);
+      const updateDoc = {
+        $set: {
+          status: updatedToy.status
+        },
+      };
+      const result = await toyCollection.updateOne(filter, updateDoc);
+      res.send(result);
     })
 
     // app.get('/addToy', async(req,res) =>{
