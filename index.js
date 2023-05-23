@@ -6,13 +6,13 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 //middleware
-// app.use(cors());
-const corsConfig = {
-  origin: '*',
-  credentials: true,
-  method: ['GET', 'POST', 'PUT', 'DELETE']
-}
-app.use(cors(corsConfig))
+app.use(cors());
+// const corsConfig = {
+//   origin: '*',
+//   credentials: true,
+//   method: ['GET', 'POST', 'PUT', 'DELETE']
+// }
+// app.use(cors(corsConfig))
 app.use(express.json());
 
 //wS5GsNu1XNkJV7kk
@@ -46,15 +46,17 @@ async function run() {
       else if (req.query?.toyName) {
         query = { toyName: req.query.toyName }
       }
-      const type = req.query.type;
+      const type = req.query?.type;
       if (type === 'Ascending') {
-        const result = await toyCollection.find(query).sort({price: 1}).limit(20).toArray();
-        res.send(result);
+        const result = await toyCollection.find(query).sort({ price: 1 }).limit(20).toArray();
+        return res.send(result);
       }
-      else{
-        const result = await toyCollection.find(query).sort({price: -1}).limit(20).toArray();
-        res.send(result);
+      else if(type === "Descending"){
+        const result = await toyCollection.find(query).sort({ price: -1 }).limit(20).toArray();
+        return res.send(result);
       }
+      const result = await toyCollection.find(query).limit(20).toArray();
+      res.send(result);
 
     })
 
